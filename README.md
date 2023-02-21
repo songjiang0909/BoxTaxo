@@ -30,9 +30,9 @@ Key Arguments Interpretation:
 
 - `--dataset`: Dataset option: environment or science.
 - `--embed_size`: Dimension of box embeddings.
-- `--margin` : Margin for containing loss.
-- `--epsilon`: Margin for negative contain.
-- `--size`:  Minimum box.
+- `--margin` : Margin for containing loss ($\delta$ in paper).
+- `--epsilon`: Margin for negative contain ($\epsilon$ in paper).
+- `--size`:  Minimum box ($\phi$ in paper).
 
 
 
