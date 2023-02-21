@@ -1,6 +1,6 @@
 BoxTaxo
 -----------------
-This is the implementation of our paper "[A Single Vector Is Not Enough: Taxonomy Expansion via  Box Embeddings]()", published in WWW'23.
+This is the implementation of our paper "[A Single Vector Is Not Enough: Taxonomy Expansion via  Box Embeddings](https://songjiang0909.github.io/pdf/boxtaxo.pdf)", published in WWW'23.
 
 Data
 -----------------
