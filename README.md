@@ -51,7 +51,7 @@ Bibtex
 ----------------------
 
 ```bibtex
-@inproceedings{boxtax,
+@inproceedings{boxtaxo,
   title={A Single Vector Is Not Enough: Taxonomy Expansion via  Box Embeddings},
   author={Song Jiang, Qiyue Yao, Qifan Wang, Yizhou Sun},
   booktitle={Proceedings of The Web Conference},
