@@ -7,7 +7,7 @@ Data
 
 The original data used could be access from SemEval-2016 Task 13: Taxonomy Extraction Evaluation.
 
-We also provide our processed data under the `data` folder.  Credits to [repo](https://github.com/yueyu1030/STEAM)
+We also provide our processed data under the `data` folder.  Credits to [repo](https://github.com/yueyu1030/STEAM)!
 
 
 Requirement
