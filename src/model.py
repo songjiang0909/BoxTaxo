@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from utils import *
 from layers import MLP
-from transformers import BertTokenizer, BertModel
+from transformers import BertModel
 
 
 
@@ -146,27 +146,6 @@ class BoxEmbed(nn.Module):
         return loss
 
 
-
-    def sibling_distance_loss(self,child_center, sibling_center):
-        
-        if self.args.sim_fun == "cos":
-            distance = self.box_center_distance_cos(child_center, sibling_center)
-        elif self.args.sim_fun == "eu":
-            distance = self.box_center_distance(child_center, sibling_center)
-        
-        zeros = torch.zeros_like(distance)
-        ones = torch.ones_like(distance)
-        margin = torch.ones_like(distance)*self.args.dis_margin
-        if self.args.sim_fun == "cos":
-            dis_mask = torch.where(distance != self.args.dis_margin, ones, zeros)
-        elif self.args.sim_fun == "eu":
-            dis_mask = torch.where(distance < self.args.dis_margin, ones, zeros)
-        distance_loss = self.dis_loss(torch.mul(distance,dis_mask),torch.mul(margin,dis_mask))
-
-        return distance_loss
-
-
-
     def box_center_distance(self,center1, center2):
         radius = center1-center2
         return torch.linalg.norm(radius,2,-1)
@@ -198,7 +177,6 @@ class BoxEmbed(nn.Module):
         mask = torch.where(flag==0, ones, zeros)
         volumn = torch.mul(product,mask)
 
-
         return volumn
 
 
@@ -224,9 +202,9 @@ class BoxEmbed(nn.Module):
         ones = torch.ones_like(flag)
         mask = torch.where(flag==False, ones, zeros)
         masked_inter_delta = torch.mul(inter_delta,mask)
+
         score_pre = torch.div(masked_inter_delta,child_delta)
         score = torch.prod(score_pre,1)
-        
 
         parent_volumn = self.box_volumn(parent_delta)
 

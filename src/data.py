@@ -1,10 +1,6 @@
 import os
-from re import L
-import time
 import numpy as np
 import pickle as pkl
-import torch
-import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -33,12 +29,7 @@ class Data_TRAIN(Dataset):
         self.child_neg_parent_pair = self.data["child_neg_parent_pair"]
         self.child_sibling_pair = self.data["child_sibling_pair"]
 
-
         self.train_child_parent_negative_parent_triple = self.data["train_child_parent_negative_parent_triple"]
-
-
-        if self.args.model == "vec":
-            self.train_child_parent_negative_parent_triple = self.negative_sampling()
         print ("Training samples: {}".format(len(self.train_child_parent_negative_parent_triple)))
 
 
@@ -49,84 +40,10 @@ class Data_TRAIN(Dataset):
 
     def __load_data__(self,dataset):
         
-        
         with open(os.path.join("../data/",dataset,"processed","taxonomy_data_"+str(self.args.expID)+"_.pkl"),"rb") as f:
             data = pkl.load(f)
         
         return data
-
-
-
-
-    def align_data(self):
-        
-        np.random.shuffle(self.child_parent_pair)
-        np.random.shuffle(self.child_neg_parent_pair)
-        np.random.shuffle(self.child_sibling_pair)
-
-        child_parent_pair = (self.child_parent_pair*self.max_len)[:self.max_len]
-        child_neg_parent_pair = (self.child_neg_parent_pair*self.max_len)[:self.max_len]
-        child_sibling_pair = (self.child_sibling_pair*self.max_len)[:self.max_len]
-
-        return np.concatenate((np.array(child_parent_pair),np.array(child_neg_parent_pair),np.array(child_sibling_pair)),axis=1), self.max_len
-
-
-    def align_data_sample(self):
-        
-        np.random.shuffle(self.child_parent_pair)
-        np.random.shuffle(self.child_neg_parent_pair)
-        np.random.shuffle(self.child_sibling_pair)
-        
-        sample_num = self.min_len*self.args.sample
-        child_parent_pair = (self.child_parent_pair*self.max_len)[:sample_num]
-        child_neg_parent_pair = (self.child_neg_parent_pair*self.max_len)[:sample_num]
-        child_sibling_pair = (self.child_sibling_pair*self.max_len)[:sample_num]
-
-        return np.concatenate((np.array(child_parent_pair),np.array(child_neg_parent_pair),np.array(child_sibling_pair)),axis=1), sample_num
-
-
-
-
-
-    def negative_sampling(self):
-        childs_query = []
-        parent_as_positive = []
-        negative_parent_list = []
-        child_sibling = []
-        sample_num = self.args.sample
-        for i in range(len(self.train_child_list)):
-            cid = self.train_child_list[i]
-            pid = self.train_parent_list[i]
-            negative_set = list(self.train_negative_parent_dict[cid])
-            sibling_set = list(self.train_sibling_dict[cid])
-
-            if np.array(negative_set).shape[0]==0:
-                continue
-            np.random.shuffle(negative_set)
-            negative_set = negative_set[:sample_num]
-
-            if np.array(sibling_set).shape[0]==0:
-                continue
-            np.random.shuffle(sibling_set)
-            sibling_set = sibling_set[:sample_num]
-
-            max_l = max(len(negative_set),len(sibling_set))
-            negative_set = (negative_set*max_l)[:max_l]
-            sibling_set = (sibling_set*max_l)[:max_l]
-            
-
-            for k in range(max_l):
-                childs_query.append(cid)
-                parent_as_positive.append(pid)
-                negative_parent_list.append(negative_set[k])
-                child_sibling.append(sibling_set[k])
-
-
-
-        child_parent_negative_parent_triple = np.stack((childs_query,parent_as_positive,negative_parent_list),axis=0).T
-        child_parent_negative_parent_triple = child_parent_negative_parent_triple.tolist()
-
-        return child_parent_negative_parent_triple
 
 
 
@@ -161,8 +78,6 @@ class Data_TRAIN(Dataset):
         return res_dic
 
 
-
-
     def generate_parent_child_token_ids(self,index):
 
         child_id,parent_id,negative_parent_id = self.train_child_parent_negative_parent_triple[index]
@@ -175,7 +90,6 @@ class Data_TRAIN(Dataset):
 
     def __getitem__(self, index):
 
-
         encode_parent, encode_child,encode_negative_parents = self.generate_parent_child_token_ids(index)
 
         return encode_parent, encode_child,encode_negative_parents
@@ -185,8 +99,6 @@ class Data_TRAIN(Dataset):
     def __len__(self):
         
         return len(self.train_child_parent_negative_parent_triple)
-
-
 
 
 
@@ -213,13 +125,8 @@ class Data_TEST(Dataset):
         self.test_concepts_id = self.data["test_concepts_id"]
         self.test_gt_id = self.data["test_gt_id"]
 
-        self.val_concept,self.val_gt, self.test_concept, self.test_gt = self.val_test_split()
 
         self.encode_all = self.generate_all_token_ids(self.tokenizer)
-        
-        self.encode_val = self.generate_test_token_ids(self.tokenizer,self.val_concept)
-        self.encode_test = self.generate_test_token_ids(self.tokenizer,self.test_concept)
-
         self.encode_query = self.generate_test_token_ids(self.tokenizer,self.test_concepts_id)
 
 
@@ -232,20 +139,6 @@ class Data_TEST(Dataset):
         return data
 
 
-
-    def val_test_split(self):
-
-        tmp = list(zip(self.test_concepts_id, self.test_gt_id))
-        np.random.shuffle(tmp)
-        num = int(len(self.test_concepts_id)*0.3333)
-        shuffled_concept, shuffled_gt = zip(*tmp)
-        val_concept, val_gt = shuffled_concept[:num], shuffled_gt[:num]
-        test_concept, test_gt = shuffled_concept[num:], shuffled_gt[num:]
-
-        print ("validation num: {}".format(len(val_concept)))
-        print ("test num: {}".format(len(test_concept)))
-
-        return val_concept, val_gt, test_concept, test_gt
 
 
     def generate_all_token_ids(self,tokenizer):

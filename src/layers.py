@@ -14,7 +14,6 @@ class MLP(nn.Module):
         self.fc1 = nn.Linear(input_dim, hidden, bias=True)
         self.fc2 = nn.Linear(hidden, hidden, bias=True)
         self.fc3 = nn.Linear(hidden, output_dim, bias=True)
-        # self.fc2 = nn.Linear(hidden, hidden, bias=True)
 
 
     def forward(self,x):
@@ -33,7 +32,7 @@ class MLP_VEC(nn.Module):
         self.fc1 = nn.Linear(input_dim, hidden, bias=True)
         self.fc2 = nn.Linear(hidden, hidden, bias=True)
         self.fc3 = nn.Linear(hidden, output_dim, bias=True)
-
+        # self.fc2 = nn.Linear(hidden, hidden, bias=True)
 
 
     def forward(self,x):

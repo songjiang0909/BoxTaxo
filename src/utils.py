@@ -1,6 +1,4 @@
 import numpy as np
-import pickle as pkl
-import torch
 import pytz
 from datetime import datetime, timezone
 
@@ -12,7 +10,6 @@ def print_local_time():
     print("Pacific time {}".format(utc_dt.astimezone(PST).isoformat()))
 
     return
-
 
 
 
@@ -63,5 +60,3 @@ def metrics(pred, gt,path2root):
 
 
     return acc,mrr,wu_p
-
-

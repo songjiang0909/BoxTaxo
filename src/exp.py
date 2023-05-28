@@ -3,9 +3,7 @@ import time
 import numpy as np
 import pickle as pkl
 import torch
-import torch.nn as nn
 from torch import optim
-# import transformers
 from transformers import BertTokenizer
 from utils import *
 from data import *
@@ -104,7 +102,7 @@ class Experiments(object):
     def train(self):
         
         time_tracker = []
-        best_val_acc = best_epoch = test_acc = test_mrr = test_wu_p = 0
+        test_acc = test_mrr = test_wu_p = 0
         for epoch in range(self.args.epochs):
             epoch_time = time.time()
 
@@ -134,19 +132,7 @@ class Experiments(object):
             train_pos_prob_loss = np.average(train_contain_loss)
             train_neg_prob_loss = np.average(train_neg_prob_loss)
 
-
-
-            val_acc,val_mrr,val_wu_p = self.validation(flag="val")
-            tmp_test_acc,tmp_test_mrr,tmp_test_wu_p = self.validation(flag="test")
             test_acc,test_mrr,test_wu_p = self.validation(flag="all")
-
-            if val_acc > best_val_acc:
-                
-                best_epoch = epoch
-                best_val_acc = val_acc
-                test_acc = tmp_test_acc
-                test_mrr = tmp_test_mrr
-                test_wu_p = tmp_test_wu_p
 
             
             
@@ -154,7 +140,6 @@ class Experiments(object):
             time_tracker.append(time.time()-epoch_time)
 
             print('Epoch: {:04d}'.format(epoch + 1),
-                 'Best epoch: {:04d}'.format(best_epoch + 1),
                 ' train_loss:{:.05f}'.format(train_loss),
                 'acc:{:.05f}'.format(test_acc),
                 'mrr:{:.05f}'.format(test_mrr),
@@ -163,6 +148,7 @@ class Experiments(object):
                 ' remain_time:{:.01f}s'.format(np.mean(time_tracker)*(self.args.epochs-(1+epoch))),
                 )
 
+        #Use the model in final epoch
         torch.save(self.model.state_dict(), os.path.join("../result",self.args.dataset,"model","exp_model_"+self.exp_setting+".checkpoint"))            
 
             
@@ -176,16 +162,8 @@ class Experiments(object):
     def validation(self,flag):
         
 
-        if flag == "val":
-            encode_query = self.test_set.encode_val
-            gt_label = self.test_set.val_gt
-        elif flag == "test":
-            encode_query = self.test_set.encode_test
-            gt_label = self.test_set.test_gt
-        elif flag == "all":
-            encode_query = self.test_set.encode_query
-            gt_label = self.test_set.test_gt_id           
-
+        encode_query = self.test_set.encode_query
+        gt_label = self.test_set.test_gt_id           
 
         self.model.eval()
         score_list = []
@@ -233,10 +211,8 @@ class Experiments(object):
             
             for i in range(len(pred)):
                 pred[i]=np.array(list(self.train_set.train_concept_set))[pred[i][ind[i]]]
-
-            
+                
             acc,mrr,wu_p = metrics(pred,gt_label,self.test_set.path2root)
-
 
         return acc,mrr,wu_p
 

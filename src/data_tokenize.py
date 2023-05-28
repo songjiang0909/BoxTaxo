@@ -26,10 +26,6 @@ class Data(Dataset):
         self.train_parent_list = self.data["train_parent_list"]
         self.train_child_list = self.data["train_child_list"]
         self.train_child_parent_negative_parent_triple = self.data["train_child_parent_negative_parent_triple"]
-        # self.train_negative_parent_list = self.data["train_negative_parent_list"]
-        # self.train_sibling_dict = self.data["train_sibling_dict"]
-        # self.train_cousin_dict = self.data["train_cousin_dict"]
-        # self.train_relative_triple = self.data["train_relative_triple"]
         self.path2root = self.data["path2root"]
 
 

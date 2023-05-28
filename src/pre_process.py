@@ -1,32 +1,21 @@
 
-import networkx as nx
-import codecs
-import random
-
 import os
 import json
 import pickle as pkl
 import numpy as np
 import collections
 from random import shuffle
-
 import time
-
-
-
 
 
 def preprocess(args,outID=True):
 
-
-
     dataset = args.dataset
-    with open(os.path.join("../data/"+str(dataset)+"/raw/"+str(dataset)+"_raw_en.taxo")) as f:
+    with open(os.path.join("../data/"+str(dataset)+"/"+str(dataset)+"_raw_en.taxo")) as f:
         taxonomy = f.readlines()        
     concept_set = set([])
     all_taxo_dict = collections.defaultdict(list)
     for pair in taxonomy:
-
         _, child, parent = pair.split("\n")[0].split("\t")
         concept_set.add(parent)
         concept_set.add(child)
@@ -41,9 +30,7 @@ def preprocess(args,outID=True):
             _, child, parent = pair.split("\n")[0].split("\t")
             all_taxo_dict[concept_id[parent]].append(concept_id[child])
 
-
     train_concept_set = set([])
-
     print ("loading training data")
     with open("../data/"+str(dataset)+"/"+str(dataset)+"_train.taxo") as f:
         train_taxonomy = f.readlines()        
@@ -57,7 +44,6 @@ def preprocess(args,outID=True):
 
     if outID:
         root_id = concept_id[root_id]
-
     for pair in train_taxonomy:
         parent, child = pair.split("\n")[0].split("\t")
         if outID:
@@ -68,12 +54,10 @@ def preprocess(args,outID=True):
         train_concept_set.add(child)
         chd2par_dict[child].add(parent) 
         taxo_dict[parent].append(child)
-        # node_heights[child] = node_heights[parent]+1
 
     cnt_dic = collections.defaultdict(float)
     for _,parent in chd2par_dict.items():
         cnt_dic[len(parent)]+=1
-
 
 
     sibling_dict = collections.defaultdict(set)
@@ -99,8 +83,8 @@ def preprocess(args,outID=True):
             cousin_dict[node] =cousin_dict[node] | set(taxo_dict[uncle])    
             cousin_dict[node] = cousin_dict[node] - sibling_dict[node]
 
-    relative_triple = []
 
+    relative_triple = []
     for node in observe_nodes:
         sibling = list(sibling_dict[node])
         cousin = list(cousin_dict[node])
@@ -109,11 +93,9 @@ def preprocess(args,outID=True):
                 relative_triple.append([node,s,c])
 
 
-
     negative_parent_dict = collections.defaultdict(set)
     for cid,_ in id_concept.items():
         negative_parent_dict[cid] = sibling_dict[cid] | cousin_dict[cid]
-
 
     child_for_negative = []
     parent_as_positive = []
@@ -131,8 +113,6 @@ def preprocess(args,outID=True):
     
     child_parent_negative_parent_triple = np.stack((child_for_negative,parent_as_positive,negative_parent_list),axis=0).T
     child_parent_negative_parent_triple = child_parent_negative_parent_triple.tolist()  
-
-
 
 
     child_parent_pair = []
@@ -188,9 +168,6 @@ def preprocess(args,outID=True):
     shuffled_concept, shuffled_gt = zip(*tmp)
     val_concept, val_gt = shuffled_concept[:num], shuffled_gt[:num]
     test_concept, test_gt = shuffled_concept[num:], shuffled_gt[num:]
-
-    
-
 
     path2root =  collections.defaultdict(list)
     for node in train_concept_set:
@@ -258,8 +235,6 @@ def create_data(args):
     print (f"From processed data, there are :{len(train_child_parent_negative_parent_triple)} training instances")
     print (f"From processed data, there are :{len(test_gt_id)} test instances")
 
-if __name__ == "__main__":
-    create_data("science")
     
 
     
