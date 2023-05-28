@@ -1,13 +1,13 @@
 BoxTaxo
 -----------------
-This is the implementation of our paper "[A Single Vector Is Not Enough: Taxonomy Expansion via  Box Embeddings]()", published in WWW'23.
+This is the implementation of our paper "[A Single Vector Is Not Enough: Taxonomy Expansion via  Box Embeddings](https://songjiang0909.github.io/pdf/boxtaxo.pdf)", published in WWW'23.
 
 Data
 -----------------
 
 The original data used could be access from SemEval-2016 Task 13: Taxonomy Extraction Evaluation.
 
-We also provide our processed data under the `data` folder. 
+We also provide our processed data under the `data` folder.  Credits to [repo](https://github.com/yueyu1030/STEAM)!
 
 
 Requirement
@@ -51,7 +51,7 @@ Bibtex
 ----------------------
 
 ```bibtex
-@inproceedings{boxtax,
+@inproceedings{boxtaxo,
   title={A Single Vector Is Not Enough: Taxonomy Expansion via  Box Embeddings},
   author={Song Jiang, Qiyue Yao, Qifan Wang, Yizhou Sun},
   booktitle={Proceedings of The Web Conference},
